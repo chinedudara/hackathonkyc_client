@@ -14,7 +14,9 @@ const apiUrl = config.apiUrl;
 const styles = (theme) => ({
 	content: {
 		flexGrow: 1,
-		padding: theme.spacing(3)
+		[theme.breakpoints.up('sm')]: {
+			padding: theme.spacing(3)
+		}
 	},
 	toolbar: theme.mixins.toolbar,
 	root: {},
@@ -62,7 +64,7 @@ const styles = (theme) => ({
     }
 });
 
-class account extends Component {
+class Profile extends Component {
 	constructor(props) {
 		super(props);
 
@@ -157,6 +159,7 @@ class account extends Component {
 											margin="dense"
 											name="firstName"
 											variant="outlined"
+											disabled={true}
 											value={this.state.firstName}
 											onChange={this.handleChange}
 										/>
@@ -168,6 +171,7 @@ class account extends Component {
 											margin="dense"
 											name="lastName"
 											variant="outlined"
+											disabled={true}
 											value={this.state.lastName}
 											onChange={this.handleChange}
 										/>
@@ -206,12 +210,13 @@ class account extends Component {
 									className={classes.submitButton}
 									onClick={this.updateFormValues}
 									disabled={
+										1 ||
 										this.state.buttonLoading ||
 										!this.state.firstName ||
 										!this.state.lastName
 									}
 								>
-									Save details
+									Update details
 									{this.state.buttonLoading && <CircularProgress size={30} className={classes.progess} />}
 								</Button>
 							</CardActions>
@@ -224,4 +229,4 @@ class account extends Component {
 	}
 }
 
-export default withStyles(styles)(account);
+export default withStyles(styles)(Profile);

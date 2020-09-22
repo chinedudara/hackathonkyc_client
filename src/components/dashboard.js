@@ -17,7 +17,7 @@ import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined'
 import CloseIcon from '@material-ui/icons/Close';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { Card, CardActions, CardContent, Button, Grid, Paper, TextField, 
-    Avatar, IconButton, Link, Box, Collapse } from '@material-ui/core';
+    Avatar, IconButton, Link, Box, Collapse, Hidden } from '@material-ui/core';
 
 import clsx from 'clsx';
 import axios from 'axios';
@@ -30,11 +30,13 @@ const apiUrl = config.apiUrl;
 const styles = ((theme) => ({
 	root: {
         width: '100%',
-        '& > * + *': {
-          marginTop: theme.spacing(2),
-        },
         flexGrow: 1,
-        padding: theme.spacing(1, 3, 2, 3),
+		[theme.breakpoints.up('sm')]: {
+            '& > * + *': {
+              marginTop: theme.spacing(1),
+            },
+            padding: theme.spacing(1, 2, 1, 2),
+		}
     },
     content: {
         // flexGrow: 1,
@@ -46,8 +48,8 @@ const styles = ((theme) => ({
         // border: '2px solid #000',
         // boxShadow: theme.shadows[5],
         padding: theme.spacing(2, 4, 3),
-        height: 230,
-        width: 250,
+        height: 210,
+        width: 230,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -64,8 +66,8 @@ const styles = ((theme) => ({
         // border: '2px solid #000',
         // boxShadow: theme.shadows[5],
         padding: theme.spacing(2, 4, 3),
-        height: 230,
-        width: 250,
+        height: 210,
+        width: 230,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -90,8 +92,8 @@ const styles = ((theme) => ({
         marginBottom: 7
       },
       iconStyle: {
-          height: 80,
-          width: 80,
+          height: 60,
+          width: 60,
         //   color: '#757575',
           color: theme.palette.primary.main,
       },
@@ -101,8 +103,8 @@ const styles = ((theme) => ({
           marginBottom: 7
       },
       iconStyleDisabled: {
-          height: 80,
-          width: 80,
+          height: 60,
+          width: 60,
           color: '#BDBDBD',
       },
       textStyle: {
@@ -184,8 +186,8 @@ const styles = ((theme) => ({
         position: 'relative',
         width: 30,
         height: 30,
-        top: 1,
-        left: 80,
+        // top: '5px',
+        left: 70,
         color: '#00b300',
     },
     pendingApproval:{
@@ -201,8 +203,11 @@ const styles = ((theme) => ({
 		color: '#BDBDBD'
     },
     headDiv: {
-        marginLeft: 30,
-        padding: 5
+        padding: 10,
+		[theme.breakpoints.up('md')]: {
+            marginLeft: 20,
+		}
+        // padding: 10
     },
     headDetails: {
         display: 'flex',
@@ -642,9 +647,7 @@ class dashboard extends Component {
                                             </Typography>
                                         </div>
                                     </Grid>
-                                </Grid>
-                                <Grid container>
-                                    <Grid item>
+                                    <Grid item alignContent="flex-end">
                                         <div className={classes.headDiv}>
                                             <Button
                                                 variant="outlined"
@@ -672,9 +675,25 @@ class dashboard extends Component {
                             
 							<CardContent>
                             <Typography variant="h6" >Verification</Typography>
-                            <Typography color="textSecondary" gutterBottom>Complete the steps below to get verified</Typography><br/>
+                            <Typography color="textSecondary" gutterBottom>Complete the steps below to get verified</Typography>
+                            <Hidden smUp implementation="css">
+                                <Button
+                                        color="primary"
+                                        variant="contained"
+                                        type="submit"
+                                        onClick={
+                                            this.state.kycLevel === 0 ? this.ToggleBvnModal
+                                            : this.state.kycLevel === 1 ? this.ToggleDocumentModal
+                                            : null
+                                        }
+                                        disabled={this.state.buttonLoading}
+                                    >
+                                        {this.state.kycLevel === 0 ? 'Start Verification' : 'Continue Verification'}
+                                        {this.state.buttonLoading && <CircularProgress size={30} className={classes.progess} />}
+                                </Button>
+                            </Hidden><br/><br/>
                                 <Grid container spacing={2}>
-                                    <Grid item lg={12} md={12} xs={12}>
+                                    <Grid item>
                                         <Grid container justify="center" spacing={3}>
                                             <Grid item>
                                                 <Paper 
@@ -720,27 +739,34 @@ class dashboard extends Component {
                                     </Grid>
                                 </Grid>
 							</CardContent>
-							<CardActions>
-                            <Button
-                                color="primary"
-                                variant="contained"
-                                type="submit"
-                                className={classes.submitButton}
-                                onClick={
-                                    this.state.kycLevel === 0 ? this.ToggleBvnModal
-                                    : this.state.kycLevel === 1 ? this.ToggleDocumentModal
-                                    : null
-                                }
-                                disabled={this.state.buttonLoading}
-                            >
-                                {this.state.kycLevel === 0 ? 'Start Verification' : 'Continue Verification'}
-                                {this.state.buttonLoading && <CircularProgress size={30} className={classes.progess} />}
-                            </Button>
-                            </CardActions>
+                            <Hidden xsDown implementation="css">
+                                <CardActions>
+                                <Button
+                                    color="primary"
+                                    variant="contained"
+                                    type="submit"
+                                    className={classes.submitButton}
+                                    onClick={
+                                        this.state.kycLevel === 0 ? this.ToggleBvnModal
+                                        : this.state.kycLevel === 1 ? this.ToggleDocumentModal
+                                        : null
+                                    }
+                                    disabled={this.state.buttonLoading}
+                                >
+                                    {this.state.kycLevel === 0 ? 'Start Verification' : 'Continue Verification'}
+                                    {this.state.buttonLoading && <CircularProgress size={30} className={classes.progess} />}
+                                </Button>
+                                </CardActions>
+                            </Hidden>
 					</Card>
 					
                     <Dialog onClose={this.closeAllModal} aria-labelledby="simple-dialog-title" scroll="body" open={this.state.bvnModalOpen ? this.state.bvnModalOpen : this.state.showOTPModal}>
                     {this.state.bvnModalOpen && <Card className={clsx(classes.paperStyle)}>
+						{/* <Hidden smUp implementation="css">
+                            <IconButton onClick={this.closeAllModal} className={classes.closeMenuButton}>
+                                <CloseIcon/>
+                            </IconButton>
+                        </Hidden> */}
                             <Typography classes={classes.textStyle} variant="h6" >
                                     BVN Verification 
                                     {this.state.token && <Link href="#" onClick={this.auxOTPCheck} variant="body2">

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-import Account from '../components/account';
+import Profile from '../components/profile';
 import Dashboard from '../components/dashboard';
 
 import Drawer from '@material-ui/core/Drawer';
@@ -23,6 +23,10 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
+import MenuIcon from '@material-ui/icons/Menu';
+import CloseIcon from '@material-ui/icons/Close';
+import Hidden from '@material-ui/core/Hidden';
+import Divider from '@material-ui/core/Divider';
 import { SnackbarProvider } from 'notistack';
 
 import { authMiddleWare } from '../util/auth'
@@ -40,8 +44,10 @@ const styles = (theme) => ({
 		zIndex: theme.zIndex.drawer + 1
 	},
 	drawer: {
+		[theme.breakpoints.up('sm')]: {
 		width: drawerWidth,
-		flexShrink: 0
+		flexShrink: 0,
+		}
 	},
 	drawerPaper: {
 		width: drawerWidth
@@ -68,14 +74,22 @@ const styles = (theme) => ({
 	toolbar: theme.mixins.toolbar,
 	menuButton: {
 	  marginRight: theme.spacing(2),
+	  [theme.breakpoints.up('sm')]: {
+		display: 'none',
+	  },
 	},
 	title: {
 	  flexGrow: 1,
 	},
 	icon: {
 		backgroundColor: theme.palette.primary.main,
-		width: 40,
-		height: 40
+		width: 35,
+		height: 35,
+		marginRight: 10
+	},
+	closeMenuButton: {
+	  marginRight: 'auto',
+	  marginLeft: 0,
 	},
 });
 
@@ -84,12 +98,18 @@ class home extends Component {
 		render: false
 	};
 
-	loadAccountPage = (event) => {
-		this.setState({ render: true });
+	loadProfilePage = (event) => {
+		this.setState({ 
+			render: true,
+            mobileOpen: false,
+		});
 	};
 
 	loadDashboardPage = (event) => {
-		this.setState({ render: false });
+		this.setState({ 
+			render: false,
+            mobileOpen: false,
+		});
 	};
 
 	logoutHandler = (event) => {
@@ -100,10 +120,6 @@ class home extends Component {
         })
 		this.props.history.push('/login');
 	};
-
-	handleChange = (event) => {
-		this.setState({ auth: event.target.checked });
-	  };
 	
 	handleMenu = (event) => {
 		this.setState({ 
@@ -116,6 +132,13 @@ class home extends Component {
             anchorEl: null
         })
 	  };
+	
+	handleDrawerToggle = () => {
+		// const mobileOpenState = this.state.mobileOpen;
+		this.setState({
+            mobileOpen: !this.state.mobileOpen,
+        })
+	  };
 
 	constructor(props) {
 		super(props);
@@ -124,6 +147,7 @@ class home extends Component {
 			uiLoading: true,
 			auth: true,
 			anchorEl: null,
+			mobileOpen: false,
 		};
 	}
 
@@ -148,6 +172,24 @@ class home extends Component {
 	};
 
 	render() {
+		const menuLinks = (
+			<div>
+				<ListItem button key="Dashboard" onClick={this.loadDashboardPage}>
+					<ListItemIcon>
+						{' '}
+						<DashboardIcon />{' '}
+					</ListItemIcon>
+					<ListItemText primary="Dashboard" />
+				</ListItem>
+				<ListItem button key="Profile" onClick={this.loadProfilePage}>
+					<ListItemIcon>
+						{' '}
+						<AccountBoxIcon />{' '}
+					</ListItemIcon>
+					<ListItemText primary="Profile" />
+				</ListItem>
+			</div>
+		)
 		const open = Boolean(this.state.anchorEl);
 		const { classes } = this.props;		
 		if (this.state.uiLoading === true) {
@@ -162,50 +204,92 @@ class home extends Component {
 					<CssBaseline />
 					<AppBar position="fixed" className={classes.appBar} elevation={2}>
 						<Toolbar>
-						<IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-							<OfflineBoltIcon className={classes.icon} />
+						<IconButton 
+							edge="start" 
+							className={classes.menuButton} 
+							color="inherit" 
+							aria-label="Open drawer"
+							onClick={this.handleDrawerToggle}
+						>
+            				<MenuIcon />
 						</IconButton>
+						<OfflineBoltIcon className={classes.icon} />
 						<Typography variant="h6" className={classes.title} noWrap>
 							Hackathon KYC
 						</Typography>
-						<div>
-							<IconButton
-								aria-label="account of current user"
-								aria-controls="menu-appbar"
-								aria-haspopup="true"
-								onClick={this.handleMenu}
-								color="inherit"
-							>
-								<AccountCircle />
-							</IconButton>
-							<Menu
-								id="menu-appbar"
-								anchorEl={this.state.anchorEl}
-								anchorOrigin={{
-								vertical: 'top',
-								horizontal: 'right',
-								}}
-								keepMounted
-								transformOrigin={{
-								vertical: 'top',
-								horizontal: 'right',
-								}}
-								open={open}
-								onClose={this.handleClose}
-							>
-								<MenuItem  onClick={this.logoutHandler}>
+						
+						<Hidden xsDown implementation="css">
+							<div>
+								<IconButton
+									aria-label="Profile of current user"
+									aria-controls="menu-appbar"
+									aria-haspopup="true"
+									onClick={this.handleMenu}
+									color="inherit"
+								>
+									<AccountCircle />
+								</IconButton>
+								<Menu
+									id="menu-appbar"
+									anchorEl={this.state.anchorEl}
+									anchorOrigin={{
+									vertical: 'top',
+									horizontal: 'right',
+									}}
+									keepMounted
+									transformOrigin={{
+									vertical: 'top',
+									horizontal: 'right',
+									}}
+									open={open}
+									onClose={this.handleClose}
+								>
+									<MenuItem  onClick={this.logoutHandler}>
+									<ListItemIcon>
+										{' '}
+										<ExitToAppIcon />{' '}
+									</ListItemIcon>
+										Logout
+									</MenuItem>
+								</Menu>
+								</div>
+							</Hidden>
+						</Toolbar>
+					</AppBar>
+					
+      				<nav className={classes.drawer}>
+					<Hidden smUp implementation="css">
+					<Drawer
+						variant="temporary"
+						open={this.state.mobileOpen}
+            			onClose={this.handleDrawerToggle}
+						classes={{
+							paper: classes.drawerPaper
+						}}
+						ModalProps={{
+							keepMounted: true, // Better open performance on mobile.
+						}}
+					>
+						
+						<IconButton onClick={this.handleDrawerToggle} className={classes.closeMenuButton}>
+							<CloseIcon/>
+						</IconButton>
+						<List>
+							{ menuLinks }
+							<Divider />
+							<ListItem button key="Logout" onClick={this.logoutHandler}>
 								<ListItemIcon>
 									{' '}
 									<ExitToAppIcon />{' '}
 								</ListItemIcon>
-									Logout
-								</MenuItem>
-							</Menu>
-							</div>
-						</Toolbar>
-					</AppBar>
+								<ListItemText primary="Logout" />
+							</ListItem>
+						</List>
+					</Drawer>
+					</Hidden>
+
+					<Hidden xsDown implementation="css">
 					<Drawer
-						className={classes.drawer}
 						variant="permanent"
 						classes={{
 							paper: classes.drawerPaper
@@ -213,25 +297,13 @@ class home extends Component {
 					>
 						<div className={classes.toolbar} />
 						<List>
-							<ListItem button key="Dashboard" onClick={this.loadDashboardPage}>
-								<ListItemIcon>
-									{' '}
-									<DashboardIcon />{' '}
-								</ListItemIcon>
-								<ListItemText primary="Dashboard" />
-							</ListItem>
-
-							<ListItem button key="Account" onClick={this.loadAccountPage}>
-								<ListItemIcon>
-									{' '}
-									<AccountBoxIcon />{' '}
-								</ListItemIcon>
-								<ListItemText primary="Account" />
-							</ListItem>
+							{ menuLinks }
 						</List>
 					</Drawer>
+					</Hidden>
+      				</nav>
 
-					<div>{this.state.render ? <Account /> : <SnackbarProvider maxSnack={3}><Dashboard /></SnackbarProvider>}</div>
+					<div>{this.state.render ? <Profile /> : <SnackbarProvider maxSnack={3}><Dashboard /></SnackbarProvider>}</div>
 				</div>
 			);
 		}
